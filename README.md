@@ -1,7 +1,5 @@
 A reviver function for JSON.parse, allowing specified functions to be substituted for their output in a JSON-like structure.
 
-See https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/JSON/parse for details of JSON.parse and its reviver function parameter.
-
 ```js
 import { 
   reviveFunctions, 
@@ -62,3 +60,5 @@ console.log(res,res2,res3)
 // [ { something: 42 }, { something: 43 } ]
 
 ```
+
+See https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/JSON/parse for details of JSON.parse and its reviver function parameter.
