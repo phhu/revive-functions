@@ -40,7 +40,7 @@ jsonLikeObject = {},
 data = undefined
 ) => {
   if (Object.keys(functions).length === 0) {
-    console.warn('Warning: ReviveFucntions: No functions provided')
+    console.warn('Warning: ReviveFunctions: No functions provided')
   }
   return JSON.parse(
     (stringifyFirst || (typeof jsonLikeObject === 'object' && stringifyFirst == null))
