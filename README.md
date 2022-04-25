@@ -2,12 +2,16 @@ A reviver function for Javascript's JSON.parse, allowing specified functions to 
 
 This is useful for allowing set functions to be applied in a JSON-like structure at runtime. For example, `{added: {$add: [2,3]},unchanged: 4}` could be converted to `{added: 5,unchanged: 4}`. An optional data object can be provided, allowing partially applied (curried) functions to use it as their last argument.
 
+```
+npm install revive-functions
+```
+
 ```js
 import { 
   reviveFunctions, 
   reviveFunctionsInObject, 
   reviveFunctionsInObjectCurried, 
-} from './revive-functions.mjs'
+} from 'revive-functions'
 
 // use directly with JSON.parse:
 const res = JSON.parse(
@@ -55,12 +59,6 @@ const data = [
 ];
 const res3 = data.map(reviver);
 // [ { something: 42 }, { something: 43 } ]
-
-console.log(res,res2,res3)
-// { something: 42 } 
-// { sum: 44 } 
-// [ { something: 42 }, { something: 43 } ]
-
 ```
 
 See https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/JSON/parse for details of JSON.parse and its reviver function parameter.
