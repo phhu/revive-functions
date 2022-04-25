@@ -1,6 +1,6 @@
 {
   "name": "revive-functions",
-  "version": "0.0.3",
+  "version": "0.0.4",
   "description": "JSON.parse reviver, allowing named functions and their parameters to be replaced by their output values",
   "main": "revive-functions.mjs",
   "type": "module",
