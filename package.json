@@ -2,14 +2,15 @@
   "name": "revive-functions",
   "version": "0.0.2",
   "description": "JSON.parse reviver, allowing named functions and their parameters to be replaced by their output values",
-  "main": "ifunction-reviver.js",
+  "main": "revive-functions.mjs",
+  "type":"module",
   "scripts": {
     "test": "npx mocha *.test.mjs",
     "tidy": "npx standard --fix"
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/phhu/function-reviver.git"
+    "url": "git+https://github.com/phhu/revive-functions.git"
   },
   "keywords": [
     "JSON",
