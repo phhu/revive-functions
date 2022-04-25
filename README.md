@@ -1,4 +1,6 @@
-A reviver function for JSON.parse, allowing specified functions to be substituted for their output in a JSON-like structure.
+A reviver function for Javascript's JSON.parse, allowing specified functions to be substituted for their output in a JSON-like structure.
+
+This is useful for allowing set functions to be applied in a JSON-like structure at runtime. For example, `{added: {$add: [2,3]},unchanged: 4}` could be converted to `{added: 5,unchanged: 4}`. An optional data object can be provided, allowing partially applied (curried) functions to use it as their last argument.
 
 ```js
 import { 
@@ -30,7 +32,7 @@ const res2 = reviveFunctionsInObject({
     addFunctionTag: f => 'fn::' + f,
   }, 
   {sum: {"fn::add":[2,{"fn::get": "test"}]}}, 
-  {test:42}
+  {test: 42}
 );
 // {sum: 44}
 
