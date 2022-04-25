@@ -1,6 +1,6 @@
 {
   "name": "revive-functions",
-  "version": "0.0.1",
+  "version": "0.0.2",
   "description": "JSON.parse reviver, allowing named functions and their parameters to be replaced by their output values",
   "main": "ifunction-reviver.js",
   "scripts": {
@@ -41,7 +41,7 @@
     "env": {
       "browser": true,
       "es6": true,
-      "mocha":true
+      "mocha": true
     },
     "rules": {
       "no-console": 0,
