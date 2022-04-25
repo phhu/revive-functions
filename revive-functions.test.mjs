@@ -1,7 +1,7 @@
-import { 
-  reviveFunctions, 
-  reviveFunctionsInObject, 
-  reviveFunctionsInObjectCurried, 
+import {
+  reviveFunctions,
+  reviveFunctionsInObject,
+  reviveFunctionsInObjectCurried
 } from './revive-functions.mjs'
 
 import { expect } from 'chai'
@@ -18,7 +18,7 @@ const functions = {
 }
 
 const objNoData = { get: { $get: ['test', { test: 1 }] } }
-const targetNoData = {get:1}
+const targetNoData = { get: 1 }
 const obj = {
   someGet: { $get: ['test', { test: 1 }] },
   getCurriedFromData: [
@@ -59,9 +59,9 @@ let clock
 beforeEach(() => { clock = sinon.useFakeTimers(now.getTime()) })
 afterEach(() => { clock.restore() })
 
-describe('reviveFunctions', ()=>{
+describe('reviveFunctions', () => {
   it('works with data', () => {
-    const actual = JSON.parse(JSON.stringify(obj),reviveFunctions({ functions }, data))
+    const actual = JSON.parse(JSON.stringify(obj), reviveFunctions({ functions }, data))
     expect(actual).to.deep.equal(target)
   })
 })

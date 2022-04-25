@@ -1,6 +1,14 @@
 A reviver function for Javascript's JSON.parse, allowing specified functions to be substituted for their output in a JSON-like structure.
 
-This is useful for allowing set functions to be applied in a JSON-like structure at runtime. For example, `{added: {$add: [2,3]}, unchanged: 4}` could be converted to `{added: 5, unchanged: 4}`. An optional data object can be provided, allowing partially applied (curried) functions to use it as their last argument. 
+This is useful for allowing set functions to be applied in a JSON-like structure at runtime. For example:
+
+`{added: {$add: [2,3]}, unchanged: 4}` 
+
+...could be converted to...
+
+`{added: 5, unchanged: 4}`. 
+
+An optional data object can be provided, allowing partially applied (curried) functions to use it as their last argument.
 
 ## Synopsis
 
@@ -49,8 +57,8 @@ const res = JSON.parse(
 );
 // {something: 42}
 
-// Without use JSON.parse, change the function prefix to fn:: ,
-// use Ramda's prop as the get function, and use nested functions:
+// Without needing to invoke JSON.parse, changing the function prefix to fn:: ,
+// using Ramda's prop as the get function, and using nested functions:
 const res2 = reviveFunctionsInObject({ 
     functions: {
       add: (x,y) => x + y,
@@ -66,11 +74,9 @@ const res2 = reviveFunctionsInObject({
 );
 // {sum: 44, unchanged: "other values get passed through"}
 
-// use a curried structure.
-// stringifyFirst defaults undefined, which does auto-detection of 
-// whether an object or a
-// string is passed in, using JSON.stringify on the former only.
-// Set a boolean to control it explicitly
+// using a curried structure against multiple data values, 
+// and explicity, superfluously, 
+// setting the object passed to be stringified first  
 const reviver = reviveFunctionsInObjectCurried({ 
     functions: {
       get: label => x => x[label]
