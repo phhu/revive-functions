@@ -1,0 +1,34 @@
+{
+  "name": "revive-functions",
+  "version": "0.0.1",
+  "description": "JSON.parse reviver, allowing named functions and their parameters to be replaced by their output values",
+  "main": "ifunction-reviver.js",
+  "scripts": {
+    "test": "jest"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/phhu/function-reviver.git"
+  },
+  "keywords": [
+    "JSON",
+    "parse",
+    "JSON.parse",
+    "revive",
+    "reviver",
+    "function",
+    "func"
+  ],
+  "author": "phhu.git@gmail.com",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/phhu/revive-functions/issues"
+  },
+  "homepage": "https://github.com/phhu/revive-functions#readme",
+  "devDependencies": {
+    "chai": "^4.3.6",
+    "mocha": "^9.2.2",
+    "sinon": "^13.0.2",
+    "standard": "^17.0.0"
+  }
+}
