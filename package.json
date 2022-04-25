@@ -4,7 +4,8 @@
   "description": "JSON.parse reviver, allowing named functions and their parameters to be replaced by their output values",
   "main": "ifunction-reviver.js",
   "scripts": {
-    "test": "jest"
+    "test": "npx mocha *.test.mjs",
+    "tidy": "npx standard --fix"
   },
   "repository": {
     "type": "git",
@@ -30,5 +31,21 @@
     "mocha": "^9.2.2",
     "sinon": "^13.0.2",
     "standard": "^17.0.0"
+  },
+  "eslintConfig": {
+    "extends": "airbnb-base",
+    "parserOptions": {
+      "ecmaVersion": 8,
+      "sourceType": "module"
+    },
+    "env": {
+      "browser": true,
+      "es6": true,
+      "mocha":true
+    },
+    "rules": {
+      "no-console": 0,
+      "no-unused-vars": 1
+    }
   }
 }

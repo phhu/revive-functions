@@ -1,6 +1,13 @@
-import { reviveFunctions, reviveFunctionsCurried} from './revive-functions.mjs'
+import { 
+  reviveFunctions, 
+  reviveFunctionsInObject, 
+  reviveFunctionsInObjectCurried, 
+} from './revive-functions.mjs'
+
 import { expect } from 'chai'
 import sinon from 'sinon'
+
+/* global it,describe, beforeEach, afterEach */
 
 const functions = {
   date: x => new Date(x === undefined ? Date.now() : x),
@@ -10,6 +17,8 @@ const functions = {
   add: (x, y) => x + y
 }
 
+const objNoData = { get: { $get: ['test', { test: 1 }] } }
+const targetNoData = {get:1}
 const obj = {
   someGet: { $get: ['test', { test: 1 }] },
   getCurriedFromData: [
@@ -25,7 +34,7 @@ const obj = {
   always: { $always: 'unchanged' },
   added: { $add: [1, { $add: [2, 3.1] }] },
   invalidFuncName: { $invalid: 'fakearg' },
-  literals: [1, -1.23, 'string', '$string', null, undefined, false, true, [], , [[]], {}, { p: 'val' }]
+  literals: [1, -1.23, 'string', '$string', null, undefined, false, true, [], [[]], {}, { p: 'val' }]
 }
 const data = { test: 2 }
 
@@ -40,26 +49,41 @@ const target = {
   literals: [
     1, -1.23, 'string', '$string',
     null, null, false, true,
-    [], null, [[]], {}, { p: 'val' }
+    [], [[]], {}, { p: 'val' }
   ]
 }
 
+// use sinon to mock live dates
 const now = new Date()
 let clock
-beforeEach(() => { clock = sinon.useFakeTimers(now.getTime());  });
-afterEach(() => {  clock.restore(); });
+beforeEach(() => { clock = sinon.useFakeTimers(now.getTime()) })
+afterEach(() => { clock.restore() })
 
-describe('it works', () => {
-  it('reviveFunctions  works', () => {    
-    const actual = reviveFunctions({functions}, obj, data)
+describe('reviveFunctions', ()=>{
+  it('works with data', () => {
+    const actual = JSON.parse(JSON.stringify(obj),reviveFunctions({ functions }, data))
     expect(actual).to.deep.equal(target)
   })
-  it('reviveFunctions works with stringified', () => {
-    const actual = reviveFunctions({functions}, JSON.stringify( obj), data)
+})
+
+describe('reviveFunctionsInObject', () => {
+  it('works with data', () => {
+    const actual = reviveFunctionsInObject({ functions }, obj, data)
     expect(actual).to.deep.equal(target)
   })
-  it('reviveFunctionsCurried works', () => {
-    const actual = reviveFunctionsCurried({functions})(obj)(data)
+  it('works without data', () => {
+    const actual = reviveFunctionsInObject({ functions }, objNoData)
+    expect(actual).to.deep.equal(targetNoData)
+  })
+  it('works with stringified object', () => {
+    const actual = reviveFunctionsInObject({ functions }, JSON.stringify(obj), data)
+    expect(actual).to.deep.equal(target)
+  })
+})
+
+describe('reviveFunctionsInObjectCurried', () => {
+  it('it works', () => {
+    const actual = reviveFunctionsInObjectCurried({ functions })(obj)(data)
     expect(actual).to.deep.equal(target)
   })
 })
