@@ -1,57 +1,35 @@
 /*
-EXAMPLE 2: Using `reviveFunctionsInObject`, which hides the call to `JSON.parse`. Here functions are injected from ramda and date-fns.
-Note that functions can be combined in the JSON-like-object ($tomorrow)
-or in the functions object ($yesterday).
-Also note that all non-function-tag elements are passed through unchanged.
+EXAMPLE 2: Use `reviveFunctions` directly with JSON.parse with a data argument.
+Note that getFromData is a curried function, with the data last.
+When a function has no arguments, use an empty array, either with or without data.
 */
 
-import { reviveFunctionsInObject } from 'revive-functions'
-import { prop, pipe } from 'ramda'
-import { add as dateAdd, format } from 'date-fns/fp/index.js'
+import { reviveFunctions } from 'revive-functions'
 
-const example2 = reviveFunctionsInObject({
-  functions: {
-    add: (x, y) => x + y,
-    get: prop,
-    today: () => Date.now(),
-    dateAdd,
-    format,
-    dateOffsetDays: pipe(
-      days => dateAdd({ days }, new Date()),
-      format('yyyy-MM-dd')
-    ),
-    negate: x=> -x,
-  }
-},
-{
-  sum: { $add: [2, { $get: 'test' }] },
-  twoWaysOfChainingFunctions: {
-    tomorrow: { $format: ['yyyy-MM-dd', { $dateAdd: [{ days: 1 }, { $today: [] }] }] },
-    yesterday: { $dateOffsetDays: -1 },
-    someWhileAgo: { $dateOffsetDays: { $negate: { $get: 'test' } } }
+const example2 = JSON.parse(`{
+  "example using data":{"$getFromData": "test"},
+  "without data": {"$sayHelloTo": "Steve"},
+  "no arguments": {"$firstDay": []},
+  "no arguments, with data": {"$firstDayTest": []}
+}`,
+  reviveFunctions({
+    functions: {
+      getFromData: prop => data => data[prop],
+      sayHelloTo: name => `Hello ${name}`,
+      firstDay: () => new Date(0),
+      firstDayTest: () => ({test}) => new Date(test)
+    }
   },
-  unchanged: { string: 'other values get passed through', array: [1, 2, 3] }
-},
-{ test: 42 }
+  { test: 42 }
+  )
 )
 
-console.log(JSON.stringify(example2, null, 2))
-
+console.log(JSON.stringify(example2,null,2))
 /*
 {
-  "sum": 44,
-  "twoWaysOfChainingFunctions": {
-    "tomorrow": "2022-04-29",
-    "yesterday": "2022-04-27",
-    "someWhileAgo": "2022-03-17"
-  },
-  "unchanged": {
-    "string": "other values get passed through",
-    "array": [
-      1,
-      2,
-      3
-    ]
-  }
+  "example using data": 42,
+  "without data": "Hello Steve",
+  "no arguments": "1970-01-01T00:00:00.000Z",
+  "no arguments, with data": "1970-01-01T00:00:00.042Z"
 }
 */
