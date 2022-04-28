@@ -40,9 +40,10 @@ EXAMPLE 1: Use `reviveFunctions` directly with JSON.parse:
 ```js
 import { reviveFunctions } from 'revive-functions'
 
-const example1 = JSON.parse(`{
-  "example":{"$get": ["test", {"test": "example value"} ] }
-}`,
+const example1 = JSON.parse(
+  `{
+    "example":{"$get": ["test", {"test": "example value"} ] }
+  }`,
   reviveFunctions({
     functions: {
       get: (prop,x) => x[prop],
@@ -52,7 +53,6 @@ const example1 = JSON.parse(`{
 
 console.log(JSON.stringify(example1))
 // {"example":"example value"}
-
 ```
 
 EXAMPLE 2: Use `reviveFunctions` directly with JSON.parse with a data argument.
