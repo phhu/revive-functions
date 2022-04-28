@@ -64,28 +64,29 @@ import { reviveFunctionsInObject } from 'revive-functions'
 import { prop, pipe } from 'ramda'
 import { add as dateAdd, format } from 'date-fns/fp/index.js'
 
-const example2 = reviveFunctionsInObject({
-  functions: {
-    add: (x, y) => x + y,
-    get: prop,
-    today: () => Date.now(),
-    dateAdd,
-    format,
-    dateOffsetDays: pipe(
-      days => dateAdd({ days }, new Date()),
-      format('yyyy-MM-dd')
-    )
-  }
-},
-{
-  sum: { $add: [2, { $get: 'test' }] },
-  twoWaysOfChainingFunctions: {
-    tomorrow: { $format: ['yyyy-MM-dd', { $dateAdd: [{ days: 1 }, { $today: [] }] }] },
-    yesterday: { $dateOffsetDays: -1 }
+const example2 = reviveFunctionsInObject(
+  {
+    functions: {
+      add: (x, y) => x + y,
+      get: prop,
+      today: () => Date.now(),
+      dateAdd,
+      format,
+      dateOffsetDays: pipe(
+        days => dateAdd({ days }, new Date()),
+        format('yyyy-MM-dd')
+      )
+    }
   },
-  unchanged: { string: 'other values get passed through', array: [1, 2, 3] }
-},
-{ test: 42 }
+  {
+    sum: { $add: [2, { $get: 'test' }] },
+    twoWaysOfChainingFunctions: {
+      tomorrow: { $format: ['yyyy-MM-dd', { $dateAdd: [{ days: 1 }, { $today: [] }] }] },
+      yesterday: { $dateOffsetDays: -1 }
+    },
+    unchanged: { string: 'other values get passed through', array: [1, 2, 3] }
+  },
+  { test: 42 }
 )
 
 console.log(JSON.stringify(example2, null, 2))
@@ -99,11 +100,7 @@ console.log(JSON.stringify(example2, null, 2))
   },
   "unchanged": {
     "string": "other values get passed through",
-    "array": [
-      1,
-      2,
-      3
-    ]
+    "array": [1, 2, 3]
   }
 }
 */
@@ -121,9 +118,8 @@ const reviver = reviveFunctionsInObjectCurried({
   },
   getFunctionTag: f => 'fn::' + f,
   stringifyFirst: true // superfluous, but possible in case we JSON which could be just a string
-}
-)({
-  something: { 'fn::get': 'test' }
+})({
+  something: { 'fn::get': 'test' } 
 })
 
 const data = [
