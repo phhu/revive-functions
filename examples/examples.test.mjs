@@ -11,14 +11,19 @@ const offSetFromToday = pipe(
 const getOutput = cmd => {
   const child = spawnSync('node', [cmd], { encoding: 'utf8' })
   if (child.error) { console.log('ERROR: ', cmd, child.error) }
-  console.log('output', cmd, child.stdout)
   return JSON.parse(child.stdout)
 }
-const examples = [1, 2, 3].map(x => `example${x}`)
+const examples = [1, 2, 3, 4].map(x => `example${x}`)
 
 const output = {
-  example1: { something: 42 },
+  example1: {"example":"example value"},
   example2: {
+    "example using data": 42,
+    "without data": "Hello Steve",
+    "no arguments": "1970-01-01T00:00:00.000Z",
+    "no arguments, with data": "1970-01-01T00:00:00.042Z"
+  },
+  example3: {
     "sum": 44,
     "twoWaysOfChainingFunctions": {
       "tomorrow": offSetFromToday(1),
@@ -34,7 +39,7 @@ const output = {
       ]
     }
   },
-  example3: [{ something: 42 }, { something: 43 }]
+  example4: [{ something: 42 }, { something: 43 }]
 }
 
 describe('Examples', () => {
