@@ -19,14 +19,16 @@ const example2 = reviveFunctionsInObject({
     dateOffsetDays: pipe(
       days => dateAdd({ days }, new Date()),
       format('yyyy-MM-dd')
-    )
+    ),
+    negate: x=> -x,
   }
 },
 {
   sum: { $add: [2, { $get: 'test' }] },
   twoWaysOfChainingFunctions: {
     tomorrow: { $format: ['yyyy-MM-dd', { $dateAdd: [{ days: 1 }, { $today: [] }] }] },
-    yesterday: { $dateOffsetDays: -1 }
+    yesterday: { $dateOffsetDays: -1 },
+    someWhileAgo: { $dateOffsetDays: { $negate: { $get: 'test' } } }
   },
   unchanged: { string: 'other values get passed through', array: [1, 2, 3] }
 },
@@ -40,7 +42,8 @@ console.log(JSON.stringify(example2, null, 2))
   "sum": 44,
   "twoWaysOfChainingFunctions": {
     "tomorrow": "2022-04-29",
-    "yesterday": "2022-04-27"
+    "yesterday": "2022-04-27",
+    "someWhileAgo": "2022-03-17"
   },
   "unchanged": {
     "string": "other values get passed through",
