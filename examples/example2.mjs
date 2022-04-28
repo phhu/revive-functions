@@ -6,21 +6,23 @@ When a function has no arguments, use an empty array, either with or without dat
 
 import { reviveFunctions } from 'revive-functions'
 
-const example2 = JSON.parse(`{
-  "example using data":{"$getFromData": "test"},
-  "without data": {"$sayHelloTo": "Steve"},
-  "no arguments": {"$firstDay": []},
-  "no arguments, with data": {"$firstDayTest": []}
-}`,
-  reviveFunctions({
-    functions: {
-      getFromData: prop => data => data[prop],
-      sayHelloTo: name => `Hello ${name}`,
-      firstDay: () => new Date(0).toISOString(),   // safest to return string
-      firstDayTest: () => ({test}) => new Date(test)    // can also return Date object
-    }
-  },
-  { test: 42 }
+const example2 = JSON.parse(
+  `{
+    "example using data":{"$getFromData": "test"},
+    "without data": {"$sayHelloTo": "Steve"},
+    "no arguments": {"$firstDay": []},
+    "no arguments, with data": {"$firstDayTest": []}
+  }`,
+  reviveFunctions(
+    {
+      functions: {
+        getFromData: prop => data => data[prop],
+        sayHelloTo: name => `Hello ${name}`,
+        firstDay: () => new Date(0).toISOString(),   // safest to return string
+        firstDayTest: () => ({test}) => new Date(test)    // can also return Date object
+      }
+    },
+    { test: 42 }
   )
 )
 
