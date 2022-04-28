@@ -36,72 +36,106 @@ reviveFunctionsInObjectCurried(options)(jsonLikeObject)(data)
 
 ## Examples
 
-```js
-import { 
-  reviveFunctions, 
-  reviveFunctionsInObject, 
-  reviveFunctionsInObjectCurried, 
-} from 'revive-functions'
-```
-Use `reviveFunctions` directly with JSON.parse:
+EXAMPLE 1: Use `reviveFunctions` directly with JSON.parse:
 ```js
 import { reviveFunctions } from 'revive-functions'
 
 const example1 = JSON.parse(
-  `{"something":{"$get": "test"}}`, 
+  '{"something":{"$get": "test"}}',
   reviveFunctions({
-      functions: {
-        get: label => x => x[label]
-      }
-    },
-    {test:42}
+    functions: {
+      get: label => x => x[label]
+    }
+  },
+  { test: 42 }
   )
-);
+)
+
+console.log(JSON.stringify(example1))
 // {something: 42}
 ```
-Using `reviveFunctionsInObject`, which avoids explicitly using `JSON.parse`; and changing the function prefix to `fn::` , using Ramda's prop as the get function, and using nested functions to make parameters:
+
+EXAMPLE 2: Using `reviveFunctionsInObject`, which hides the call to `JSON.parse`. Here functions are injected from ramda and date-fns.
+Note that functions can be combined in the JSON-like-object ($tomorrow)
+or in the functions object ($yesterday).
+Also note that all non-function-tag elements are passed through unchanged.
 ```js
 import { reviveFunctionsInObject } from 'revive-functions'
-import { prop } from 'ramda'
-import { addDays } from 'date-fns/fp/index.js'
+import { prop, pipe } from 'ramda'
+import { add as dateAdd, format } from 'date-fns/fp/index.js'
 
-const example2 = reviveFunctionsInObject({ 
-    functions: {
-      add: (x,y) => x + y,
-      get: prop,
-      today: () => Date.now(),
-      addDays,  
-    },
-    getFunctionTag: f => 'fn::' + f,
-  }, 
-  {
-    sum: {"fn::add": [2, {"fn::get": "test"}] },
-    tomorrow: {"fn::addDays": [1, {"fn::today":[]} ]},
-    unchanged: "other values get passed through",
-  }, 
-  {test: 42}
-);
-// {sum: 44, unchanged: "other values get passed through"}
+const example2 = reviveFunctionsInObject({
+  functions: {
+    add: (x, y) => x + y,
+    get: prop,
+    today: () => Date.now(),
+    dateAdd,
+    format,
+    dateOffsetDays: pipe(
+      days => dateAdd({ days }, new Date()),
+      format('yyyy-MM-dd')
+    )
+  }
+},
+{
+  sum: { $add: [2, { $get: 'test' }] },
+  twoWaysOfChainingFunctions: {
+    tomorrow: { $format: ['yyyy-MM-dd', { $dateAdd: [{ days: 1 }, { $today: [] }] }] },
+    yesterday: { $dateOffsetDays: -1 }
+  },
+  unchanged: { string: 'other values get passed through', array: [1, 2, 3] }
+},
+{ test: 42 }
+)
+
+console.log(JSON.stringify(example2, null, 2))
+
+/*
+{
+  "sum": 44,
+  "twoWaysOfChainingFunctions": {
+    "tomorrow": "2022-04-29",
+    "yesterday": "2022-04-27"
+  },
+  "unchanged": {
+    "string": "other values get passed through",
+    "array": [
+      1,
+      2,
+      3
+    ]
+  }
+}
+*/
+
 ```
-Using a curried structure against multiple data values, and explicity, superfluously, setting the object passed to be stringified first  
+EXAMPLE 3: Use a curried structure with `reviveFunctionsInObjectCurried`.
+Useful for working with an array of objects (collection).
+Also change the function tag to use "fn::" convention (like AWS).
 ```js
 import { reviveFunctionsInObjectCurried } from 'revive-functions'
 
-const reviver = reviveFunctionsInObjectCurried({ 
-    functions: {
-      get: label => x => x[label]
-    },
-    stringifyFirst: true   
-  }
-)({something: {"$get": "test"}});
+const reviver = reviveFunctionsInObjectCurried({
+  functions: {
+    get: label => x => x[label]
+  },
+  getFunctionTag: f => 'fn::' + f,
+  stringifyFirst: true // superfluous, but possible in case we JSON which could be just a string
+}
+)({
+  something: { 'fn::get': 'test' }
+})
 
 const data = [
-  {test:42},
-  {test:43}
-];
+  { test: 42 },
+  { test: 43 }
+]
 
-const example3 = data.map(reviver);
+const example3 = data.map(reviver)
+
+console.log(JSON.stringify(example3))
 // [ { something: 42 }, { something: 43 } ]
+
 ```
 
 ## References
