@@ -3,14 +3,14 @@
  */
 export const reviveFunctions = ({
   functions = { }, /* e.g add: (x,y) => x+y */
-  addFunctionTag = f => '$' + f
+  getFunctionTag = f => '$' + f
 } = {},
 data = undefined
 ) => function reviveFunctionsInner (key, item) {
   if (typeof item === 'object' && item != null && !Array.isArray(item)) {
     const [firstKey, args] = Object.entries(item)?.[0] ?? []
     const func = Object.entries(functions)
-      .find(([key, f]) => addFunctionTag(key) === firstKey)
+      .find(([key, f]) => getFunctionTag(key) === firstKey)
       ?.[1]
     if (firstKey && func && Object.keys(item).length === 1) {
       const funcRes = func( // call the function
@@ -33,7 +33,7 @@ data = undefined
  */
 export const reviveFunctionsInObject = ({
   functions = { /* e.g add: (x,y) => x+y */ },
-  addFunctionTag = f => '$' + f,
+  getFunctionTag = f => '$' + f,
   stringifyFirst = undefined
 } = {},
 jsonLikeObject = {},
@@ -46,7 +46,7 @@ data = undefined
     (stringifyFirst || (typeof jsonLikeObject === 'object' && stringifyFirst == null))
       ? JSON.stringify(jsonLikeObject)
       : jsonLikeObject,
-    reviveFunctions({ functions, addFunctionTag }, data)
+    reviveFunctions({ functions, getFunctionTag }, data)
   )
 }
 

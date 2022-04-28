@@ -27,8 +27,8 @@ reviveFunctionsInObjectCurried(options)(jsonLikeObject)(data)
 ```
 
 * `options` is an object with three keys:
-  * `functions` is an object containing key value pairs of function names and function bodies. Defaults to `{}`. It can be useful to pass selected functions from libraries such as Ramda or lodash/fp.
-  * `addFunctionTag` is a function which, given a function name (e.g. `get`), returns a function tag (e.g. `$get`). Defaults to `name=>"$"+name`, i.e. using "$" as a function tag.
+  * `functions` is an object containing key value pairs of function names and function bodies. Defaults to `{}`. It can be useful to pass selected functions from libraries such as Ramda, lodash/fp, or date-fns.
+  * `getFunctionTag` is a function which, given a function name (e.g. `get`), returns a function tag (e.g. `$get`). Defaults to `name=>"$"+name`, i.e. using "$" as a function tag.
   * `stringifyFirst`: for `reviveFunctionsInObject` and `reviveFunctionsInObjectCurried`, allows explicit determination of whether to run `JSON.stringify` on the input value, before passing to `JSON.parse`. Defaults to `undefined`, meaning this is done on objects only.
 * `data` an optional Javascript value to be passed as a curried last argument to `functions`
 * `jsonLikeObject` is a JSON-like Javascript structure, or a string containing valid JSON, in which objects containing function specifications like `{$functionname: [param1, param2, ...]}` will be substituted with the result of calling the function with the specified parameters (and, optionally, the data object, applied as a last, curried argument). If only one parameter is needed, the array can be omitted (e.g. `{$functionname: param1}`). Parameters can be generated recursively, from nested function calls (see examples below). The whole JSON-like tree is parsed. Items which are not recognised as function specifications are passed through unchanged, as per normal `JSON.parse` behaviour.
@@ -42,10 +42,12 @@ import {
   reviveFunctionsInObject, 
   reviveFunctionsInObjectCurried, 
 } from 'revive-functions'
-import { prop } from 'ramda'
+```
+Use `reviveFunctions` directly with JSON.parse:
+```js
+import { reviveFunctions } from 'revive-functions'
 
-// use directly with JSON.parse:
-const res = JSON.parse(
+const example1 = JSON.parse(
   `{"something":{"$get": "test"}}`, 
   reviveFunctions({
       functions: {
@@ -56,27 +58,35 @@ const res = JSON.parse(
   )
 );
 // {something: 42}
+```
+Using `reviveFunctionsInObject`, which avoids explicitly using `JSON.parse`; and changing the function prefix to `fn::` , using Ramda's prop as the get function, and using nested functions to make parameters:
+```js
+import { reviveFunctionsInObject } from 'revive-functions'
+import { prop } from 'ramda'
+import { addDays } from 'date-fns/fp/index.js'
 
-// Without needing to invoke JSON.parse, changing the function prefix to fn:: ,
-// using Ramda's prop as the get function, and using nested functions:
-const res2 = reviveFunctionsInObject({ 
+const example2 = reviveFunctionsInObject({ 
     functions: {
       add: (x,y) => x + y,
-      get: prop  
+      get: prop,
+      today: () => Date.now(),
+      addDays,  
     },
-    addFunctionTag: f => 'fn::' + f,
+    getFunctionTag: f => 'fn::' + f,
   }, 
   {
     sum: {"fn::add": [2, {"fn::get": "test"}] },
-    unchanged: "other values get passed through"
+    tomorrow: {"fn::addDays": [1, {"fn::today":[]} ]},
+    unchanged: "other values get passed through",
   }, 
   {test: 42}
 );
 // {sum: 44, unchanged: "other values get passed through"}
+```
+Using a curried structure against multiple data values, and explicity, superfluously, setting the object passed to be stringified first  
+```js
+import { reviveFunctionsInObjectCurried } from 'revive-functions'
 
-// using a curried structure against multiple data values, 
-// and explicity, superfluously, 
-// setting the object passed to be stringified first  
 const reviver = reviveFunctionsInObjectCurried({ 
     functions: {
       get: label => x => x[label]
@@ -89,7 +99,8 @@ const data = [
   {test:42},
   {test:43}
 ];
-const res3 = data.map(reviver);
+
+const example3 = data.map(reviver);
 // [ { something: 42 }, { something: 43 } ]
 ```
 
