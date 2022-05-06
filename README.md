@@ -1,4 +1,4 @@
-A reviver function for Javascript's JSON.parse, allowing specified functions to be substituted for their output in a JSON-like structure.
+A function reviver, as might be used with Javascript's JSON.parse, allowing specified functions to be substituted for their output in a JSON-like structure.
 
 This is useful for allowing set functions to be applied in a JSON-like structure at runtime. For example:
 
@@ -16,9 +16,9 @@ An optional data object can be provided, allowing partially applied (curried) fu
 npm install revive-functions
 
 import { 
-  reviveFunctions, 
-  reviveFunctionsInObject, 
-  reviveFunctionsInObjectCurried, 
+  reviveFunctions,
+  reviveFunctionsInObject,
+  reviveFunctionsInObjectCurried
 } from 'revive-functions'
 
 JSON.parse(jsonString, reviveFunctions(options, data))
@@ -29,14 +29,19 @@ reviveFunctionsInObjectCurried(options)(jsonLikeObject)(data)
 * `options` is an object with three keys:
   * `functions` is an object containing key value pairs of function names and function bodies. Defaults to `{}`. It can be useful to pass selected functions from libraries such as Ramda, lodash/fp, or date-fns.
   * `getFunctionTag` is a function which, given a function name (e.g. `myfunc`), returns a function tag (e.g. `$myfunc`). Defaults to `name=>"$"+name`, i.e. using "$" as a function tag.
-  * `stringifyFirst`: for `reviveFunctionsInObject` and `reviveFunctionsInObjectCurried`, allows explicit determination of whether to run `JSON.stringify` on the input value, before passing to `JSON.parse`. Defaults to `undefined`, meaning this is done on objects only.
+  * `stringifyFirst`: Boolean. For `reviveFunctionsInObject` and `reviveFunctionsInObjectCurried`, allows explicit determination of whether to run `JSON.stringify` on the input value, before passing to `JSON.parse`. Defaults to `undefined`, meaning this is done on objects only.
+  * `bindDataToFunction` (boolean, default false). Set to true to have `data` bound to functions, so that it can be referred to as `this` (in non-arrow functions only).
+  * `callFunctionsReturnedWithData` (boolean, default true). Set to false to NOT use currying with the data argument: i.e. if the function call returns a function, the latter will not be called with the data. Useful if you want to return functions from the reviver without having to use currying.
+
 * `data` an optional Javascript value to be passed as a curried last argument to `functions`
 * `jsonLikeObject` is a JSON-like Javascript structure, or a string containing valid JSON, in which objects containing function specifications like `{$functionname: [param1, param2, ...]}` will be substituted with the result of calling the function with the specified parameters (and, optionally, the data object, applied as a last, curried argument). If only one parameter is needed, the array can be omitted (e.g. `{$functionname: param1}`). Parameters can be generated recursively, from nested function calls (see examples below). The whole JSON-like tree is parsed. Items which are not recognised as function specifications are passed through unchanged, as per normal `JSON.parse` behaviour.
 * `jsonString` is a string as would normally be passed to `JSON.parse`
 
+Return values are as per `JSON.parse`: generally Javascript data structures, typically objects or arrays. These could be equivalent to valid JSON, but could also include regular JS objects (such as Dates or functions), where these are returned by the `functions` supplied.
+
 ## Examples
 
-EXAMPLE 1: Use `reviveFunctions` directly with JSON.parse:
+EXAMPLE 1: Use `reviveFunctions` directly with `JSON.parse` (without a data argument):
 ```js
 import { reviveFunctions } from 'revive-functions'
 
@@ -116,7 +121,7 @@ const example3 = reviveFunctionsInObject(
         days => dateAdd({ days }, new Date()),
         format('yyyy-MM-dd')
       ),
-      negate: x=> -x,
+      negate: x => -x,
     }
   },
   {
@@ -153,7 +158,7 @@ EXAMPLE 4: Use a curried structure with `reviveFunctionsInObjectCurried`.
 Useful for working with an array of objects (collection).
 Also change the function tag to use "fn::" convention (like AWS).
 
-Specifying stringifyFirst as true is superfluous, 
+Specifying stringifyFirst as true (or false) is generally superfluous, 
 but might be useful in some cases, perhaps if the JSON like object 
 might be a plain string.
 ```js

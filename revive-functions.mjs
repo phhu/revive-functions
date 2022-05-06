@@ -3,7 +3,9 @@
  */
 export const reviveFunctions = ({
   functions = { }, /* e.g add: (x,y) => x+y */
-  getFunctionTag = f => '$' + f
+  getFunctionTag = f => '$' + f,
+  bindDataToFunction = false,
+  callFunctionsReturnedWithData = true
 } = {},
 data = undefined
 ) => function reviveFunctionsInner (key, item) {
@@ -13,14 +15,16 @@ data = undefined
       .find(([key, f]) => getFunctionTag(key) === firstKey)
       ?.[1]
     if (firstKey && func && Object.keys(item).length === 1) {
-      const funcRes = func( // call the function
+      const funcRes = (bindDataToFunction ? func.bind(data) : func)( // call the function
         ...(
           [].concat(args) // allow single arg without array
             .map(arg => reviveFunctionsInner(null, arg)) // argument recursion
         )
       )
       // optional data as curried last argument:
-      return typeof (funcRes) === 'function' ? funcRes(data) : funcRes
+      return (callFunctionsReturnedWithData && typeof (funcRes) === 'function')
+        ? funcRes(data)
+        : funcRes
     }
   };
   return item // default to unmodified
@@ -34,7 +38,9 @@ data = undefined
 export const reviveFunctionsInObject = ({
   functions = { /* e.g add: (x,y) => x+y */ },
   getFunctionTag = f => '$' + f,
-  stringifyFirst = undefined
+  stringifyFirst = undefined,
+  bindDataToFunction = false,
+  callFunctionsReturnedWithData = true
 } = {},
 jsonLikeObject = {},
 data = undefined
@@ -46,7 +52,12 @@ data = undefined
     (stringifyFirst || (typeof jsonLikeObject === 'object' && stringifyFirst == null))
       ? JSON.stringify(jsonLikeObject)
       : jsonLikeObject,
-    reviveFunctions({ functions, getFunctionTag }, data)
+    reviveFunctions({
+      functions,
+      getFunctionTag,
+      bindDataToFunction,
+      callFunctionsReturnedWithData
+    }, data)
   )
 }
 

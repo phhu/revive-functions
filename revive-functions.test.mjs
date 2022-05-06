@@ -82,8 +82,59 @@ describe('reviveFunctionsInObject', () => {
 })
 
 describe('reviveFunctionsInObjectCurried', () => {
-  it('it works', () => {
+  it('works', () => {
     const actual = reviveFunctionsInObjectCurried({ functions })(obj)(data)
     expect(actual).to.deep.equal(target)
+  })
+})
+
+describe('bindDataToFunction', () => {
+  const data = { someKey: 33 }
+  const functions = {
+    get: function (prop) { return this?.[prop] },
+    getArrow: prop => this?.[prop]
+  }
+  const obj = {
+    test: { $get: 'someKey' },
+    testArrow: { $getArrow: 'someKey' }
+  }
+  it('works when true, with normal functions', () => {
+    const actual = reviveFunctionsInObject({
+      functions,
+      bindDataToFunction: true
+    }, obj, data)
+    expect(actual).to.deep.equal({ test: 33 })
+  })
+  it('does not work when false', () => {
+    const actual = reviveFunctionsInObject({
+      functions,
+      bindDataToFunction: false
+    }, obj, data)
+    expect(actual).to.deep.equal({})
+  })
+  it('does not work when not specified (defaults to false)', () => {
+    const actual = reviveFunctionsInObject({
+      functions
+      //, bindDataToFunction:false
+    }, obj, data)
+    expect(actual).to.deep.equal({})
+  })
+})
+
+describe('callFunctionsReturnedWithData', () => {
+  const data = { someKey: 33 }
+  const functions = {
+    get: prop => data => data[prop]
+  }
+  const obj = {
+    test: { $get: 'someKey' }
+  }
+  it('returns functions when false, and this function works as expected', () => {
+    const actual = reviveFunctionsInObject({
+      functions,
+      callFunctionsReturnedWithData: false
+    }, obj, data)
+    expect(typeof actual.test).to.equal('function')
+    expect(actual.test(data)).to.equal(33)
   })
 })
