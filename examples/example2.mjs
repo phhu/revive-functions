@@ -18,15 +18,15 @@ const example2 = JSON.parse(
       functions: {
         getFromData: prop => data => data[prop],
         sayHelloTo: name => `Hello ${name}`,
-        firstDay: () => new Date(0).toISOString(),   // safest to return string
-        firstDayTest: () => ({test}) => new Date(test)    // can also return Date object
+        firstDay: () => new Date(0).toISOString(), // safest to return string
+        firstDayTest: () => ({ test }) => new Date(test) // can also return Date object
       }
     },
     { test: 42 }
   )
 )
 
-console.log(JSON.stringify(example2,null,2))
+console.log(JSON.stringify(example2, null, 2))
 /*
 {
   "example using data": 42,

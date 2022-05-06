@@ -16,23 +16,23 @@ const getOutput = cmd => {
 const examples = [1, 2, 3, 4].map(x => `example${x}`)
 
 const output = {
-  example1: {"example":"example value"},
+  example1: { example: 'example value' },
   example2: {
-    "example using data": 42,
-    "without data": "Hello Steve",
-    "no arguments": "1970-01-01T00:00:00.000Z",
-    "no arguments, with data": "1970-01-01T00:00:00.042Z"
+    'example using data': 42,
+    'without data': 'Hello Steve',
+    'no arguments': '1970-01-01T00:00:00.000Z',
+    'no arguments, with data': '1970-01-01T00:00:00.042Z'
   },
   example3: {
-    "sum": 44,
-    "twoWaysOfChainingFunctions": {
-      "tomorrow": offSetFromToday(1),
-      "yesterday": offSetFromToday(-1),
-      "someWhileAgo": offSetFromToday(-42)
+    sum: 44,
+    twoWaysOfChainingFunctions: {
+      tomorrow: offSetFromToday(1),
+      yesterday: offSetFromToday(-1),
+      someWhileAgo: offSetFromToday(-42)
     },
-    "unchanged": {
-      "string": "other values get passed through",
-      "array": [
+    unchanged: {
+      string: 'other values get passed through',
+      array: [
         1,
         2,
         3

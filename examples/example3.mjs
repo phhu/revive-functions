@@ -1,5 +1,5 @@
 /*
-EXAMPLE 3: Using `reviveFunctionsInObject`, which hides the call to `JSON.parse`. 
+EXAMPLE 3: Using `reviveFunctionsInObject`, which hides the call to `JSON.parse`.
 Here functions are injected from ramda and date-fns.
 Note that functions can be combined in the JSON-like-object ($tomorrow)
 or in the functions object ($yesterday).
@@ -22,19 +22,27 @@ const example3 = reviveFunctionsInObject(
         days => dateAdd({ days }, new Date()),
         format('yyyy-MM-dd')
       ),
-      negate: x=> -x,
+      negate: x => -x
     }
   },
   {
-    sum: { $add: [2, { $get: 'test' }] },
+    sum: {
+      $add: [
+        2,
+        { $get: 'test' }
+      ]
+    },
     twoWaysOfChainingFunctions: {
       tomorrow: { $format: ['yyyy-MM-dd', { $dateAdd: [{ days: 1 }, { $today: [] }] }] },
       yesterday: { $dateOffsetDays: -1 },
       someWhileAgo: { $dateOffsetDays: { $negate: { $get: 'test' } } }
     },
-    unchanged: { string: 'other values get passed through', array: [1, 2, 3] }
+    unchanged: {
+      string: 'other values get passed through',
+      array: [1, 2, 3]
+    }
   },
-  { test: 42 }     // data object
+  { test: 42 } // data object
 )
 
 console.log(JSON.stringify(example3, null, 2))

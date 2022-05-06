@@ -10,7 +10,7 @@ const example1 = JSON.parse(
   }`,
   reviveFunctions({
     functions: {
-      get: (prop,x) => x[prop],
+      get: (prop, x) => x[prop]
     }
   })
 )
